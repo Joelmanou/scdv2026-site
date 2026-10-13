@@ -25,7 +25,7 @@
   ];
 
   // Version des médias : à augmenter quand les vidéos ou vignettes changent (cache CDN Hostinger).
-  var V = '6';
+  var V = '7';
 
   var list = document.getElementById('setlist');
   var html = '';
@@ -187,7 +187,7 @@
 
   // Partage
   var url = location.href.split('#')[0];
-  var message = 'Ruben Binam — SCDV 2026. Découvrez les 7 piliers du renouveau de la SCDV : ' + url;
+  var message = 'Ruben Binam — SCDV 2026. Découvrez les 7 piliers de la SCDV New Age : ' + url;
   var wa = document.querySelectorAll('.js-share-wa');
   for (var w = 0; w < wa.length; w++) wa[w].href = 'https://wa.me/?text=' + encodeURIComponent(message);
   var fb = document.querySelectorAll('.js-share-fb');
