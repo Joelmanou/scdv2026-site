@@ -51,7 +51,10 @@
             '</div>' +
             '<div class="row__media">' +
               '<video controls playsinline preload="none" poster="assets/poster-' + n + '.jpg?v=' + V + '" data-src="videos/pilier-' + n + '.mp4?v=' + V + '"></video>' +
-              '<a class="row__dl" href="videos/pilier-' + n + '.mp4?v=' + V + '" download="SCDV2026-pilier-' + n + '-' + verbe + '.mp4">Télécharger cette vidéo</a>' +
+              '<div class="row__dl">' +
+                '<button type="button" class="row__fs">Plein écran</button>' +
+                '<a href="videos/pilier-' + n + '.mp4?v=' + V + '" download="SCDV2026-pilier-' + n + '-' + verbe + '.mp4">Télécharger cette vidéo</a>' +
+              '</div>' +
             '</div>' +
           '</div>' +
         '</details>' +
@@ -112,6 +115,14 @@
     if (wide.matches && !list.querySelector('details[open]')) allDetails[0].open = true;
   }
   list.addEventListener('click', function (e) {
+    if (e.target.className === 'row__fs') {
+      var v = e.target.parentNode.parentNode.querySelector('video');
+      if (!v.getAttribute('src')) v.setAttribute('src', v.getAttribute('data-src'));
+      enterFullscreen(v);
+      var pp = v.play();
+      if (pp && pp.then) pp.then(null, function () {});
+      return;
+    }
     if (e.target.className === 'row__more') {
       // Affiche ou masque le texte écrit ; la vidéo se redimensionne en conséquence.
       var body = e.target.parentNode.parentNode;
@@ -147,6 +158,32 @@
   window.addEventListener('hashchange', fromHash);
   fromHash();
   ensureOneOpen();
+
+  // Plein écran : bouton dédié sous la vidéo complète, et passage automatique en plein écran
+  // quand on lance une vidéo sur téléphone (Chrome y cache le bouton plein écran dans le menu ⋮).
+  function isFullscreen() {
+    return document.fullscreenElement || document.webkitFullscreenElement;
+  }
+  function enterFullscreen(video) {
+    var request = video.requestFullscreen || video.webkitRequestFullscreen || video.webkitEnterFullscreen;
+    if (!request) return;
+    try {
+      var p = request.call(video);
+      if (p && p.then) p.then(null, function () {});
+    } catch (err) { /* refusé par le navigateur : la vidéo continue dans la page */ }
+  }
+  document.addEventListener('play', function (e) {
+    if (narrow.matches && e.target.tagName === 'VIDEO' && !isFullscreen()) enterFullscreen(e.target);
+  }, true);
+  var fsButton = document.querySelector('.js-fullscreen');
+  if (fsButton) {
+    fsButton.addEventListener('click', function () {
+      var video = document.querySelector('.film__player video');
+      enterFullscreen(video);
+      var p = video.play();
+      if (p && p.then) p.then(null, function () {});
+    });
+  }
 
   // Partage
   var url = location.href.split('#')[0];

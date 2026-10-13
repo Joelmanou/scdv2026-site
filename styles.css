@@ -343,11 +343,25 @@ h1, h2 { margin: 0; font-weight: 400; }
   box-shadow: 0 18px 40px rgba(0,40,26,.35);
 }
 .row__dl {
-  display: inline-block;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
   margin-top: 12px;
   font-weight: 700;
   font-size: 14px;
   color: var(--ink);
+}
+.row__dl a { color: var(--ink); }
+.row__fs {
+  margin-right: 14px;
+  padding: 7px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--white);
+  font: 700 13px/1.2 var(--body);
+  cursor: pointer;
 }
 
 /* Vidéo complète */
@@ -377,6 +391,9 @@ h1, h2 { margin: 0; font-weight: 400; }
   line-height: 1;
 }
 .film__text > p:not(.eyebrow) { max-width: 44ch; margin: 20px 0 28px; }
+.film__actions { display: flex; flex-wrap: wrap; align-items: center; }
+.film__actions .btn { margin: 0 20px 12px 0; }
+.film__dl { font-weight: 700; font-size: 15px; color: var(--white); margin-bottom: 12px; }
 
 /* Mise en œuvre */
 .method {
@@ -702,18 +719,22 @@ h1, h2 { margin: 0; font-weight: 400; }
     min-height: var(--app-h, 100vh);
     padding: 20px 16px;
   }
-  .film__player { max-width: none; margin-bottom: 14px; }
+  .film__player { max-width: none; margin-bottom: 12px; }
+  /* La vidéo prend toute la hauteur libre (écran moins titre et boutons), en 9:16. */
   .film__player video {
-    height: 50vh;
-    height: calc(var(--app-h, 100vh) * .5);
-    width: calc(50vh * 9 / 16);
-    width: calc(var(--app-h, 100vh) * .5 * 9 / 16);
+    height: 60vh;
+    height: calc(var(--app-h, 100vh) - 258px);
+    width: calc(60vh * 9 / 16);
+    width: calc((var(--app-h, 100vh) - 258px) * 9 / 16);
     max-width: 100%;
     object-fit: contain;
   }
-  .film__text .eyebrow { margin-bottom: 6px; }
-  .film__text h2 { font-size: 30px; margin-bottom: 14px; }
-  .film__text > p:not(.eyebrow) { margin: 10px auto 14px; font-size: 14px; line-height: 1.45; }
+  .film__text .eyebrow { margin-bottom: 4px; }
+  .film__text h2 { font-size: 26px; margin-bottom: 12px; }
+  .film__text > p:not(.eyebrow) { display: none; }
+  .film__actions { flex-direction: column; }
+  .film__actions .btn { margin: 0 0 6px; min-height: 46px; }
+  .film__dl { font-size: 14px; margin-bottom: 0; }
 
   /* Mise en œuvre : plus compacte pour tenir dans un écran. */
   .method { padding: 40px 16px; }
