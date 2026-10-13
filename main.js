@@ -46,6 +46,7 @@
             '<div class="row__reading">' +
               '<p class="row__kicker">Pilier ' + n + ' sur 7 · ' + verbe + '</p>' +
               '<h3 class="row__title">' + theme + '</h3>' +
+              '<button type="button" class="row__more" aria-expanded="false">Lire le texte</button>' +
               '<p class="row__text">' + texte + '</p>' +
             '</div>' +
             '<div class="row__media">' +
@@ -60,6 +61,30 @@
 
   var allDetails = list.querySelectorAll('details');
   var wide = window.matchMedia ? window.matchMedia('(min-width: 1024px)') : { matches: false };
+  var narrow = window.matchMedia ? window.matchMedia('(max-width: 860px)') : { matches: true };
+
+  // Fiche mobile : la vidéo prend toute la place libre, à ses vraies proportions (9:16),
+  // sans bandes noires. Calculé en JS pour fonctionner aussi sur les vieux navigateurs.
+  function fitVideo(details) {
+    var video = details.querySelector('video');
+    var media = details.querySelector('.row__media');
+    var dl = details.querySelector('.row__dl');
+    video.style.width = '';
+    video.style.height = '';
+    video.style.flex = '';
+    if (!narrow.matches || !details.open) return;
+    var availH = media.clientHeight - dl.offsetHeight - 10;
+    var availW = media.clientWidth;
+    var w = Math.max(120, Math.min(availW, availH * 9 / 16));
+    video.style.flex = 'none';
+    video.style.width = Math.floor(w) + 'px';
+    video.style.height = Math.floor(w * 16 / 9) + 'px';
+  }
+  function fitOpen() {
+    var open = list.querySelector('details[open]');
+    if (open) fitVideo(open);
+  }
+  window.addEventListener('resize', fitOpen);
 
   // Les vidéos ne se chargent qu'à l'ouverture du pilier, et s'arrêtent à sa fermeture.
   var root = document.documentElement;
@@ -75,6 +100,7 @@
       for (var k = 0; k < allDetails.length; k++) {
         if (allDetails[k] !== details && allDetails[k].open) allDetails[k].open = false;
       }
+      setTimeout(function () { fitVideo(details); }, 0);
     } else {
       video.pause();
     }
@@ -86,6 +112,16 @@
     if (wide.matches && !list.querySelector('details[open]')) allDetails[0].open = true;
   }
   list.addEventListener('click', function (e) {
+    if (e.target.className === 'row__more') {
+      // Affiche ou masque le texte écrit ; la vidéo se redimensionne en conséquence.
+      var body = e.target.parentNode.parentNode;
+      var showing = / is-text/.test(body.className);
+      body.className = showing ? body.className.replace(/ is-text/g, '') : body.className + ' is-text';
+      e.target.textContent = showing ? 'Lire le texte' : 'Masquer le texte';
+      e.target.setAttribute('aria-expanded', showing ? 'false' : 'true');
+      fitVideo(body.parentNode);
+      return;
+    }
     if (e.target.className === 'row__close') {
       var d = e.target.parentNode.parentNode;
       d.open = false;

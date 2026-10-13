@@ -522,7 +522,8 @@ h1, h2 { margin: 0; font-weight: 400; }
 }
 @keyframes panel { from { opacity: 0; transform: translateX(24px); } }
 
-.row__close { display: none; }
+.row__close,
+.row__more { display: none; }
 
 /* Tablette et mobile : chaque grande section tient dans un écran.
    --app-h = hauteur réelle de l'écran, mesurée par main.js (100vh en secours). */
@@ -613,15 +614,17 @@ h1, h2 { margin: 0; font-weight: 400; }
     color: var(--ink);
     overflow: hidden;
   }
-  /* Un transform sur la ligne empêcherait la fiche « fixed » de couvrir l'écran : fondu seul. */
-  .js-reveal .row { transform: none; }
+  /* Pas d'animation d'apparition sur mobile : une ligne encore transparente ou décalée
+     rendrait invisible la fiche plein écran (ex. lien direct …/#pilier-4). */
+  .js-reveal .row { opacity: 1; transform: none; }
   .row__close {
     display: block;
-    align-self: flex-end;
-    flex: 0 0 auto;
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    z-index: 2;
     min-height: 40px;
     padding: 0 16px;
-    margin-bottom: 6px;
     border: 2px solid var(--ink);
     border-radius: 999px;
     background: transparent;
@@ -631,7 +634,30 @@ h1, h2 { margin: 0; font-weight: 400; }
   }
   .row__reading { flex: 0 0 auto; }
   .row__kicker, .row__title { display: block; }
-  .row__kicker { margin: 0 0 4px; font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+  .row__kicker {
+    margin: 0 120px 4px 0;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  /* Le texte est déjà écrit dans la vidéo : masqué par défaut pour lui laisser la place. */
+  .row__body .row__text { display: none; }
+  .row__body.is-text .row__text { display: block; }
+  .row__more {
+    display: inline-block;
+    margin: 0 0 10px;
+    padding: 6px 14px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--white);
+    font: 700 13px/1.2 var(--body);
+    cursor: pointer;
+  }
   .row__title {
     margin: 0 0 8px;
     font-family: var(--display);
@@ -649,6 +675,7 @@ h1, h2 { margin: 0; font-weight: 400; }
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
   }
   .row__media video {
     flex: 1 1 auto;
@@ -657,9 +684,9 @@ h1, h2 { margin: 0; font-weight: 400; }
     width: 100%;
     aspect-ratio: auto;
     object-fit: contain;
-    background: transparent;
-    box-shadow: none;
-    border-radius: 0;
+    background: var(--green);
+    border-radius: 16px;
+    box-shadow: 0 14px 34px rgba(0,40,26,.35);
   }
   .row__dl { flex: 0 0 auto; margin-top: 8px; }
   .pilier-open body { overflow: hidden; }
