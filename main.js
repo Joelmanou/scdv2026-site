@@ -12,6 +12,9 @@
     ['Moderniser', 'La digitalisation de la SCDV', 'Digitaliser les procédures et les services pour une gestion moderne, plus rapide, plus accessible et plus transparente.']
   ];
 
+  // Version des médias : à augmenter quand les vidéos ou vignettes changent (cache CDN Hostinger).
+  var V = '6';
+
   var list = document.getElementById('setlist');
   var html = '';
   for (var i = 0; i < PILIERS.length; i++) {
@@ -33,8 +36,8 @@
               '<p class="row__text">' + texte + '</p>' +
             '</div>' +
             '<div class="row__media">' +
-              '<video controls playsinline preload="none" poster="assets/poster-' + n + '.jpg" data-src="videos/pilier-' + n + '.mp4"></video>' +
-              '<a class="row__dl" href="videos/pilier-' + n + '.mp4" download="SCDV2026-pilier-' + n + '-' + verbe + '.mp4">Télécharger cette vidéo</a>' +
+              '<video controls playsinline preload="none" poster="assets/poster-' + n + '.jpg?v=' + V + '" data-src="videos/pilier-' + n + '.mp4?v=' + V + '"></video>' +
+              '<a class="row__dl" href="videos/pilier-' + n + '.mp4?v=' + V + '" download="SCDV2026-pilier-' + n + '-' + verbe + '.mp4">Télécharger cette vidéo</a>' +
             '</div>' +
           '</div>' +
         '</details>' +
