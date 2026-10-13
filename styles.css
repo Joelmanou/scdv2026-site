@@ -483,7 +483,8 @@ h1, h2 { margin: 0; font-weight: 400; }
     width: 52%;
     padding: 18px 0 0 40px;
     border-left: 3px solid var(--ink);
-    grid-template-columns: minmax(0, 1fr) auto;
+    /* Colonnes à proportion fixe : la vidéo ne peut plus écraser le texte sur les écrans moyens. */
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
     gap: 32px;
     align-items: center;
   }
@@ -507,7 +508,13 @@ h1, h2 { margin: 0; font-weight: 400; }
   }
   .row__text { font-size: clamp(17px, 2.5svh, 23px); max-width: none; }
   .row__media { text-align: center; }
-  .row__media video { height: min(calc(100svh - 230px), 560px); width: auto; }
+  .row__media video {
+    width: 100%;
+    height: auto;
+    max-height: calc(100vh - 230px);
+    max-height: calc(100svh - 230px);
+    object-fit: contain;
+  }
 
   @media (prefers-reduced-motion: no-preference) {
     .row details[open] .row__body { animation: panel .45s cubic-bezier(.2,.7,.2,1); }
@@ -545,7 +552,7 @@ h1, h2 { margin: 0; font-weight: 400; }
   }
   .hero__text { order: 2; flex: 0 0 auto; margin-top: -36px; padding-bottom: 0; }
   .hero .eyebrow { margin-bottom: 6px; font-size: 11px; line-height: 1.4; }
-  .hero__name { font-size: 17vw; line-height: .95; white-space: nowrap; }
+  .hero__name { font-size: 17vw; font-size: min(17vw, 120px); line-height: .95; white-space: nowrap; }
   .hero__name span { display: inline; }
   .hero__motto { margin-top: 8px; font-size: 18px; font-size: clamp(16px, 5.4vw, 26px); }
   .hero__motto i { padding: 0 .15em; }
@@ -586,6 +593,8 @@ h1, h2 { margin: 0; font-weight: 400; }
     max-width: none;
   }
   .row__toggle { grid-column: 3; grid-row: 1 / span 2; width: 34px; height: 34px; }
+  /* Contenu des piliers fermés : sans marge héritée de l'ordinateur (il ne dépasse plus). */
+  .row__body { grid-template-columns: 1fr; padding: 0; }
   .row__toggle::before, .row__toggle::after { width: 12px; }
 
   /* Pilier ouvert : fiche plein écran, la vidéo prend la hauteur restante. */
@@ -676,8 +685,14 @@ h1, h2 { margin: 0; font-weight: 400; }
     object-fit: contain;
   }
   .film__text .eyebrow { margin-bottom: 6px; }
-  .film__text h2 { font-size: 30px; }
+  .film__text h2 { font-size: 30px; margin-bottom: 14px; }
   .film__text > p:not(.eyebrow) { margin: 10px auto 14px; font-size: 14px; line-height: 1.45; }
+
+  /* Mise en œuvre : plus compacte pour tenir dans un écran. */
+  .method { padding: 40px 16px; }
+  .method h2 { font-size: 28px; }
+  .method__text { font-size: 16px; line-height: 1.5; margin: 14px auto 18px; }
+  .method__tags li { font-size: 13px; padding: 4px 12px; margin: 0 6px 8px 0; }
 }
 
 /* Petits écrans en hauteur : on retire ce qui est secondaire pour que tout tienne. */
