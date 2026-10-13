@@ -1,6 +1,18 @@
 // Écrit pour fonctionner aussi sur les vieux téléphones (Android 7, Chrome ancien) :
 // pas d'async/await, pas de padStart, pas de catch sans paramètre.
 (function () {
+  // Hauteur réelle de l'écran (sans la barre d'adresse) pour que chaque section mobile tienne
+  // dans un écran. Recalculée seulement si la largeur change (rotation), pas quand la barre
+  // d'adresse apparaît ou disparaît au défilement, sinon la page sauterait.
+  var lastW = 0;
+  function setAppHeight() {
+    if (window.innerWidth === lastW) return;
+    lastW = window.innerWidth;
+    document.documentElement.style.setProperty('--app-h', window.innerHeight + 'px');
+  }
+  setAppHeight();
+  window.addEventListener('resize', setAppHeight);
+
   // Texte repris mot pour mot du programme « Les 7 piliers du renouveau de la SCDV ».
   var PILIERS = [
     ['Rassembler', 'L’unité de tous les artistes', 'Rassembler tous les artistes membres de la SCDV autour d’une vision commune, fondée sur la solidarité, le dialogue et la défense de leurs intérêts.'],
@@ -30,6 +42,7 @@
             '<span class="row__toggle" aria-hidden="true"></span>' +
           '</summary>' +
           '<div class="row__body">' +
+            '<button type="button" class="row__close" aria-label="Fermer le pilier">Fermer ✕</button>' +
             '<div class="row__reading">' +
               '<p class="row__kicker">Pilier ' + n + ' sur 7 · ' + verbe + '</p>' +
               '<h3 class="row__title">' + theme + '</h3>' +
@@ -49,9 +62,13 @@
   var wide = window.matchMedia ? window.matchMedia('(min-width: 1024px)') : { matches: false };
 
   // Les vidéos ne se chargent qu'à l'ouverture du pilier, et s'arrêtent à sa fermeture.
+  var root = document.documentElement;
   function onToggle(details) {
     var video = details.querySelector('video');
     if (!video) return;
+    // Sur mobile, un pilier ouvert s'affiche en plein écran : on bloque le défilement derrière.
+    root.className = root.className.replace(/\s*pilier-open/g, '');
+    if (list.querySelector('details[open]')) root.className += ' pilier-open';
     if (details.open) {
       if (!video.getAttribute('src')) video.setAttribute('src', video.getAttribute('data-src'));
       // Un seul pilier ouvert à la fois (l'attribut name n'est pas compris partout).
@@ -69,6 +86,15 @@
     if (wide.matches && !list.querySelector('details[open]')) allDetails[0].open = true;
   }
   list.addEventListener('click', function (e) {
+    if (e.target.className === 'row__close') {
+      var d = e.target.parentNode.parentNode;
+      d.open = false;
+      onToggle(d);
+      // Ramène la liste des piliers à l'écran après fermeture.
+      var section = document.getElementById('piliers');
+      if (section.scrollIntoView) section.scrollIntoView();
+      return;
+    }
     var el = e.target;
     while (el && el !== list && el.tagName !== 'SUMMARY') el = el.parentNode;
     if (wide.matches && el && el.tagName === 'SUMMARY' && el.parentNode.open) e.preventDefault();

@@ -515,41 +515,183 @@ h1, h2 { margin: 0; font-weight: 400; }
 }
 @keyframes panel { from { opacity: 0; transform: translateX(24px); } }
 
-/* Tablette et mobile */
+.row__close { display: none; }
+
+/* Tablette et mobile : chaque grande section tient dans un écran.
+   --app-h = hauteur réelle de l'écran, mesurée par main.js (100vh en secours). */
 @media (max-width: 860px) {
+  html { scroll-snap-type: y proximity; }
+  .hero, .rdv, .setlist, .film, .method, .share { scroll-snap-align: start; }
+
+  /* Haut de page : la photo prend la place restante, le texte garde sa taille. */
   .hero {
-    grid-template-columns: 1fr;
-    min-height: 0;
-    padding-top: 84px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: var(--app-h, 100vh);
+    min-height: 520px;
+    padding: 72px 16px 18px;
   }
-  .hero__photo { order: 1; margin: 0 -16px; }
-  .hero__photo img { max-height: none; }
-  .hero__text { order: 2; margin-top: -18%; padding-bottom: 56px; }
-  .hero__motto { font-size: 18px; font-size: clamp(17px, 5.6vw, 30px); }
+  .hero__photo { order: 1; flex: 1 1 auto; align-self: stretch; min-height: 0; position: relative; margin: 0 -16px; }
+  .hero__photo img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    object-fit: contain;
+    object-position: center bottom;
+  }
+  .hero__text { order: 2; flex: 0 0 auto; margin-top: -36px; padding-bottom: 0; }
+  .hero .eyebrow { margin-bottom: 6px; font-size: 11px; line-height: 1.4; }
+  .hero__name { font-size: 17vw; line-height: .95; white-space: nowrap; }
+  .hero__name span { display: inline; }
+  .hero__motto { margin-top: 8px; font-size: 18px; font-size: clamp(16px, 5.4vw, 26px); }
   .hero__motto i { padding: 0 .15em; }
+  .hero__lead { margin-top: 4px; font-size: 15px; line-height: 1.45; max-width: none; }
+  .hero__actions { margin-top: 12px; }
+  .hero__actions .btn { flex: 1 1 100%; min-height: 46px; margin: 0 0 8px; }
 
-  .row summary { grid-template-columns: 30px minmax(0, 1fr) 40px; gap: 0 10px; }
-  .row__verb { font-size: 42px; font-size: clamp(38px, 12.5vw, 80px); }
-  .row__theme { grid-column: 2; grid-row: 2; justify-self: start; text-align: left; font-size: 15px; margin-top: -4px; }
-  .row__toggle { grid-column: 3; grid-row: 1 / span 2; width: 40px; height: 40px; }
-  .row__body { grid-template-columns: 1fr; padding: 4px 0 32px 46px; }
-  .row__media { max-width: 260px; }
+  /* Les 7 piliers : les 7 lignes se partagent la hauteur de l'écran. */
+  .setlist {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: var(--app-h, 100vh);
+    min-height: 520px;
+    padding: 18px 16px 10px;
+  }
+  .setlist__head { display: block; padding-bottom: 8px; border-bottom-width: 2px; }
+  .setlist__head h2 { font-size: 7.4vw; margin: 0; white-space: nowrap; }
+  .setlist__head p { margin-top: 2px; font-size: 13px; line-height: 1.35; }
+  .setlist__list { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; margin: 0; width: 100%; }
+  .row { flex: 1 1 0; display: flex; flex-direction: column; justify-content: center; min-height: 0; border-bottom-width: 1px; }
+  .row:last-child { border-bottom: 0; }
+  .row summary { grid-template-columns: 30px minmax(0, 1fr) 36px; gap: 0 8px; padding: 0; }
+  .row__n { font-size: 12px; margin-right: 0; white-space: nowrap; }
+  .row__verb {
+    font-size: 40px;
+    font-size: calc((var(--app-h, 100vh) - 150px) / 7 * .5);
+    line-height: 1;
+  }
+  .row__theme {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+    text-align: left;
+    font-size: 12.5px;
+    line-height: 1.25;
+    margin-top: 2px;
+    max-width: none;
+  }
+  .row__toggle { grid-column: 3; grid-row: 1 / span 2; width: 34px; height: 34px; }
+  .row__toggle::before, .row__toggle::after { width: 12px; }
 
-  .film { grid-template-columns: 1fr; }
-  .film__player { max-width: 320px; }
+  /* Pilier ouvert : fiche plein écran, la vidéo prend la hauteur restante. */
+  .row details[open] .row__body {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+    background: var(--ocre);
+    color: var(--ink);
+    overflow: hidden;
+  }
+  /* Un transform sur la ligne empêcherait la fiche « fixed » de couvrir l'écran : fondu seul. */
+  .js-reveal .row { transform: none; }
+  .row__close {
+    display: block;
+    align-self: flex-end;
+    flex: 0 0 auto;
+    min-height: 40px;
+    padding: 0 16px;
+    margin-bottom: 6px;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink);
+    font: 700 14px/1 var(--body);
+    cursor: pointer;
+  }
+  .row__reading { flex: 0 0 auto; }
+  .row__kicker, .row__title { display: block; }
+  .row__kicker { margin: 0 0 4px; font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+  .row__title {
+    margin: 0 0 8px;
+    font-family: var(--display);
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: 30px;
+    line-height: 1.05;
+    color: var(--white);
+  }
+  .row__text { margin: 0 0 12px; font-size: 16px; line-height: 1.45; max-width: none; }
+  .row__media {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-width: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .row__media video {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 0;
+    width: 100%;
+    aspect-ratio: auto;
+    object-fit: contain;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+  }
+  .row__dl { flex: 0 0 auto; margin-top: 8px; }
+  .pilier-open body { overflow: hidden; }
+
+  /* Vidéo complète : vidéo + titre + bouton dans un écran. */
+  .film {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 100vh;
+    min-height: var(--app-h, 100vh);
+    padding: 20px 16px;
+  }
+  .film__player { max-width: none; margin-bottom: 14px; }
+  .film__player video {
+    height: 50vh;
+    height: calc(var(--app-h, 100vh) * .5);
+    width: calc(50vh * 9 / 16);
+    width: calc(var(--app-h, 100vh) * .5 * 9 / 16);
+    max-width: 100%;
+    object-fit: contain;
+  }
+  .film__text .eyebrow { margin-bottom: 6px; }
+  .film__text h2 { font-size: 30px; }
+  .film__text > p:not(.eyebrow) { margin: 10px auto 14px; font-size: 14px; line-height: 1.45; }
 }
 
-@media (max-width: 420px) {
-  .row__body { padding-left: 0; }
-  .hero__actions .btn { flex: 1 1 100%; }
+/* Petits écrans en hauteur : on retire ce qui est secondaire pour que tout tienne. */
+@media (max-width: 860px) and (max-height: 680px) {
+  .row__theme { display: none; }
+  .film__text > p:not(.eyebrow) { display: none; }
+  .hero__lead { display: none; }
 }
 
 /* Vieux navigateurs sans grid (Chrome < 57, fréquent sur Android 7) : mise en page simple. */
 @supports not (display: grid) {
   .row summary { position: relative; padding-right: 54px; align-items: center; }
   .row__theme { width: 100%; text-align: left; }
-  .row__toggle { position: absolute; right: 0; top: 50%; margin-top: -20px; }
-  .row__media { max-width: 260px; }
+  .row__toggle { position: absolute; right: 0; top: 50%; margin-top: -17px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
