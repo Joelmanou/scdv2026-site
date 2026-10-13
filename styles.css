@@ -542,6 +542,49 @@ h1, h2 { margin: 0; font-weight: 400; }
 .row__close,
 .row__more { display: none; }
 
+/* Lecteur plein écran maison (créé par main.js) : vidéo + bouton « Retour ». */
+#fs-player {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
+  background: #000;
+}
+#fs-player.is-active { display: block; }
+#fs-player video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none;
+  max-height: none;
+  aspect-ratio: auto;
+  object-fit: contain;
+  border-radius: 0;
+  box-shadow: none;
+  background: #000;
+}
+.fs-back {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 2;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 2px solid rgba(255,255,255,.85);
+  border-radius: 999px;
+  background: rgba(0,0,0,.55);
+  color: #fff;
+  font: 700 16px/1 var(--body);
+  cursor: pointer;
+}
+.fs-back:hover { background: rgba(0,0,0,.8); }
+.fs-open body { overflow: hidden; }
+
 /* Tablette et mobile : chaque grande section tient dans un écran.
    --app-h = hauteur réelle de l'écran, mesurée par main.js (100vh en secours). */
 @media (max-width: 860px) {

@@ -50,7 +50,7 @@
               '<p class="row__text">' + texte + '</p>' +
             '</div>' +
             '<div class="row__media">' +
-              '<video controls playsinline preload="none" poster="assets/poster-' + n + '.jpg?v=' + V + '" data-src="videos/pilier-' + n + '.mp4?v=' + V + '"></video>' +
+              '<video controls controlslist="nofullscreen" playsinline preload="none" poster="assets/poster-' + n + '.jpg?v=' + V + '" data-src="videos/pilier-' + n + '.mp4?v=' + V + '"></video>' +
               '<div class="row__dl">' +
                 '<button type="button" class="row__fs">Plein écran</button>' +
                 '<a href="videos/pilier-' + n + '.mp4?v=' + V + '" download="SCDV2026-pilier-' + n + '-' + verbe + '.mp4">Télécharger cette vidéo</a>' +
@@ -72,6 +72,7 @@
     var video = details.querySelector('video');
     var media = details.querySelector('.row__media');
     var dl = details.querySelector('.row__dl');
+    if (!video) return; // la vidéo est dans le lecteur plein écran
     video.style.width = '';
     video.style.height = '';
     video.style.flex = '';
@@ -159,31 +160,101 @@
   fromHash();
   ensureOneOpen();
 
-  // Plein écran : bouton dédié sous la vidéo complète, et passage automatique en plein écran
-  // quand on lance une vidéo sur téléphone (Chrome y cache le bouton plein écran dans le menu ⋮).
-  function isFullscreen() {
+  // Lecteur plein écran maison : le plein écran natif d'une <video> n'accepte aucun bouton,
+  // donc la vidéo est déplacée dans un conteneur noir (#fs-player) qui porte le bouton « Retour »,
+  // et c'est ce conteneur qui passe en plein écran. Sans API plein écran (vieux téléphones),
+  // le conteneur couvre simplement tout l'écran.
+  var player = document.createElement('div');
+  player.id = 'fs-player';
+  player.innerHTML = '<button type="button" class="fs-back">← Retour</button>';
+  document.body.appendChild(player);
+  var current = null; // { video, parent, next }
+  var historyPushed = false;
+  var reopenBlockedUntil = 0; // évite de rouvrir le lecteur quand la lecture reprend après « Retour »
+
+  function fsElement() {
     return document.fullscreenElement || document.webkitFullscreenElement;
   }
-  function enterFullscreen(video) {
-    var request = video.requestFullscreen || video.webkitRequestFullscreen || video.webkitEnterFullscreen;
-    if (!request) return;
-    try {
-      var p = request.call(video);
-      if (p && p.then) p.then(null, function () {});
-    } catch (err) { /* refusé par le navigateur : la vidéo continue dans la page */ }
+  function playSafely(video) {
+    var p = video.play();
+    if (p && p.then) p.then(null, function () {});
   }
+  function openPlayer(video) {
+    if (current) return;
+    if (!video.getAttribute('src') && video.getAttribute('data-src')) video.setAttribute('src', video.getAttribute('data-src'));
+    current = { video: video, parent: video.parentNode, next: video.nextSibling };
+    player.appendChild(video);
+    player.className = 'is-active';
+    root.className += ' fs-open';
+    var request = player.requestFullscreen || player.webkitRequestFullscreen;
+    if (request) {
+      try {
+        var p = request.call(player);
+        if (p && p.then) p.then(null, function () {});
+      } catch (err) { /* le conteneur reste affiché en plein écran « simulé » */ }
+    }
+    // La touche retour d'Android ferme le lecteur au lieu de quitter le site.
+    if (window.history && history.pushState) {
+      history.pushState({ fsPlayer: true }, '');
+      historyPushed = true;
+    }
+    playSafely(video);
+  }
+  function closePlayer() {
+    if (!current) return;
+    var video = current.video;
+    reopenBlockedUntil = new Date().getTime() + 1500;
+    current.parent.insertBefore(video, current.next);
+    current = null;
+    player.className = '';
+    root.className = root.className.replace(/\s*fs-open/g, '');
+    if (fsElement()) {
+      var exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if (exit) {
+        try {
+          var p = exit.call(document);
+          if (p && p.then) p.then(null, function () {});
+        } catch (err) { /* déjà sorti */ }
+      }
+    }
+    playSafely(video); // la lecture continue dans la page
+    fitOpen();
+  }
+  // « Retour » : on remonte l'historique ajouté à l'ouverture, ce qui déclenche la fermeture.
+  player.querySelector('.fs-back').addEventListener('click', function () {
+    if (historyPushed) history.back();
+    else closePlayer();
+  });
+  window.addEventListener('popstate', function () {
+    if (historyPushed) {
+      historyPushed = false;
+      closePlayer();
+    }
+  });
+  // Sortie du plein écran par le système (geste, touche Échap) : on referme aussi le lecteur.
+  function onFsChange() {
+    if (!fsElement() && current) {
+      if (historyPushed) history.back();
+      else closePlayer();
+    }
+  }
+  document.addEventListener('fullscreenchange', onFsChange);
+  document.addEventListener('webkitfullscreenchange', onFsChange);
+
+  // Sur téléphone, lancer une vidéo ouvre le lecteur plein écran.
   document.addEventListener('play', function (e) {
-    if (narrow.matches && e.target.tagName === 'VIDEO' && !isFullscreen()) enterFullscreen(e.target);
+    if (narrow.matches && e.target.tagName === 'VIDEO' && !current && new Date().getTime() > reopenBlockedUntil) {
+      openPlayer(e.target);
+    }
   }, true);
   var fsButton = document.querySelector('.js-fullscreen');
   if (fsButton) {
     fsButton.addEventListener('click', function () {
-      var video = document.querySelector('.film__player video');
-      enterFullscreen(video);
-      var p = video.play();
-      if (p && p.then) p.then(null, function () {});
+      openPlayer(document.querySelector('.film__player video'));
     });
   }
+  // Les boutons « Plein écran » des piliers appellent enterFullscreen.
+  function enterFullscreen(video) { openPlayer(video); }
 
   // Partage
   var url = location.href.split('#')[0];
