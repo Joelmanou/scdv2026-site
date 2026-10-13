@@ -104,7 +104,7 @@ h1, h2 { margin: 0; font-weight: 400; }
   align-items: end;
   max-width: var(--max);
   margin: 0 auto;
-  padding: 170px var(--gutter) 0;
+  padding: clamp(110px, 20svh, 170px) var(--gutter) 0;
   overflow: hidden;
 }
 .hero__text {
@@ -115,7 +115,7 @@ h1, h2 { margin: 0; font-weight: 400; }
 .hero__name {
   font-family: var(--display);
   text-transform: uppercase;
-  font-size: clamp(88px, 15vw, 216px);
+  font-size: clamp(88px, min(15vw, 21svh), 216px);
   line-height: .9;
   letter-spacing: .01em;
 }
