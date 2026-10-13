@@ -172,6 +172,43 @@ h1, h2 { margin: 0; font-weight: 400; }
 @keyframes rise { from { opacity: 0; transform: translateY(40px); } }
 @keyframes fade { from { opacity: 0; transform: scale(1.04); } }
 
+/* Rendez-vous de l'assemblée générale */
+.rdv {
+  background: var(--green-deep);
+  padding: 32px max(var(--gutter), calc((100% - var(--max)) / 2 + var(--gutter)));
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 20px 40px;
+  align-items: center;
+}
+.rdv__date {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ocre-light);
+}
+.rdv__day { font-family: var(--display); font-size: 84px; line-height: .9; }
+.rdv__month { font-family: var(--display); font-size: 26px; line-height: 1; text-transform: uppercase; }
+.rdv__info h2 {
+  font-family: var(--display);
+  text-transform: uppercase;
+  font-size: clamp(24px, 2.4vw, 32px);
+  line-height: 1.1;
+}
+.rdv__info p { margin: 6px 0 0; }
+.rdv__info .rdv__note { font-size: 14px; color: rgba(255,255,255,.7); }
+.rdv__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+@media (max-width: 1100px) {
+  .rdv { grid-template-columns: auto minmax(0, 1fr); }
+  .rdv__actions { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .rdv { grid-template-columns: 1fr; }
+  .rdv__day { font-size: 64px; }
+  .rdv__actions .btn { flex: 1 1 100%; }
+}
+
 /* Setlist des 7 piliers */
 .setlist {
   background: var(--ocre);

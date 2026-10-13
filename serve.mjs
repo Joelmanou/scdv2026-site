@@ -13,6 +13,7 @@ const types = {
   '.jpg': 'image/jpeg',
   '.png': 'image/png',
   '.mp4': 'video/mp4',
+  '.ics': 'text/calendar; charset=utf-8',
 };
 
 http.createServer((req, res) => {

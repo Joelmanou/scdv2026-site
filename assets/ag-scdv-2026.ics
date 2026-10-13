@@ -1,0 +1,20 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//SCDV 2026 Ruben Binam//FR
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:ag-elective-scdv-20261015@scdv2026.rubenbinam.com
+DTSTAMP:20261013T000000Z
+DTSTART:20261015T070000Z
+DTEND:20261015T150000Z
+SUMMARY:Assemblée générale élective de la SCDV
+LOCATION:Salle de convivialité du Musée national\, Ministère des Arts et de la Culture\, Yaoundé
+DESCRIPTION:Assemblée générale extraordinaire\, élective\, inclusive et apaisée de la SCDV. À partir de 8 h précises. https://scdv2026.rubenbinam.com
+BEGIN:VALARM
+TRIGGER:-PT12H
+ACTION:DISPLAY
+DESCRIPTION:Demain : assemblée générale élective de la SCDV
+END:VALARM
+END:VEVENT
+END:VCALENDAR
